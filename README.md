@@ -1,1 +1,1 @@
-## sales-analysis-power-bi-project
+# Sales Analysis Power BI Project
