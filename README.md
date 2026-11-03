@@ -1,108 +1,193 @@
-# 🍫 Awesome Chocolates — Executive Sales & Profitability Analytics Dashboard
+# 🍫 Awesome Chocolates: Sales & Profitability Dashboard
 
-## 📌 Executive Summary
-This end-to-end business intelligence project delivers an interactive executive sales dashboard built in Power BI Desktop for **Awesome Chocolates**, a multi-region confectionery manufacturer. 
+An interactive executive dashboard built in **Power BI Desktop** for Awesome Chocolates, a multi-region confectionery manufacturer. It tracks revenue, profit, shipment efficiency and salesperson performance across six markets.
 
-Because publishing to Power BI Service requires an organizational or school Microsoft tenant, this repository serves as a self-contained portfolio artifact. It documents the underlying data architecture, dimensional modeling, custom DAX metrics, business KPIs, and UI/UX patterns used to evaluate product performance, salesperson benchmarks, and shipment efficiency.
+> 📄 **No Power BI Desktop?** [View or download the dashboard PDF](Awesome_Chocolates_Dashboard.pdf) to see the full layout in your browser.
+
+**Tools & skills:** Power BI · DAX · Star schema modeling · Time intelligence · Field parameters · Bookmarks · Conditional formatting
 
 ---
 
-## 📊 Dashboard Visual Showcase
+## Table of Contents
 
-### Primary Executive View (Sales & Salesperson Performance)
+1. [Project Overview](#project-overview)
+2. [Dashboard Preview](#dashboard-preview)
+3. [Key Insights](#key-insights)
+4. [Data Model](#data-model)
+5. [DAX Measures](#dax-measures)
+6. [Dashboard Features](#dashboard-features)
+7. [How to Open This Project](#how-to-open-this-project)
+
+---
+
+## Project Overview
+
+Publishing to Power BI Service requires an organizational or school Microsoft tenant, so this repository works as a self-contained portfolio piece. It documents the data model, DAX measures, KPIs and design choices used to evaluate:
+
+- Product performance
+- Salesperson benchmarks
+- Shipment efficiency
+
+---
+
+## Dashboard Preview
+
+### Main Executive View
+
 ![Awesome Chocolates Dashboard](0.%20Main.png)
 
-*The dashboard features single-row KPI cards with dynamic month-on-month (MoM) indicators, a multi-measure trend chart driven by field parameters, a low-box shipment distribution histogram, dynamic category/geography slicers, and a bookmark-toggled performance matrix.*
+The page includes:
+
+- Single-row KPI cards with month-on-month (MoM) indicators
+- A trend chart driven by field parameters
+- A histogram of shipment box quantities
+- Category and geography slicers
+- A bookmark-toggled performance matrix
 
 ---
 
-## 🔑 Key Business Questions & Strategic Insights
+## Key Insights
 
-1. **Overall Financial Health**:
-   - Total Gross Revenue generated: **$34M**
-   - Total Operating & Product Cost: **$14M**
-   - Total Net Profit: **$21M**
-   - Company Gross Profit Margin: **60.3%** (exceeding the baseline enterprise target of 60.0%).
+### 1. Financial Health
 
-2. **Trend & Seasonality Analysis**:
-   - Tracking monthly cyclicality across revenue, shipment volume, box volume, costs, and margins using a dynamic measure selector.
-   - Month-on-Month (MoM) revenue performance shows a contraction of **-10.8%** in the latest reported period ($2.53M).
+| Metric | Value |
+|---|---|
+| Total Sales | **$34.0M** ($34,042,511) |
+| Total Costs | **$13.5M** ($13,518,441) |
+| Total Profit | **$20.5M** ($20,524,070) |
+| Profit Margin | **60.3%** (target: 60.0%) |
 
-3. **Low-Box Shipment (LBS) Efficiency**:
-   - Tracking shipments with fewer than 50 boxes (used primarily for client sampling or sub-optimal order sizes).
-   - Total LBS orders count: **624 shipments** out of **6,113 total shipments** (**10.2%** of all deliveries), slightly exceeding the 10.0% internal operational target threshold.
+The company is slightly above its 60% margin benchmark.
 
-4. **Sales Team & Product Accountability**:
-   - Evaluating team performance against target profit margins using automated RAG (Red-Amber-Green) indicators.
-   - Seamlessly toggling between individual sales representative rankings and product line performance without visual clutter.
+### 2. Trends and Seasonality
+
+- A measure selector lets users view monthly patterns in sales, boxes, shipments, costs and profit.
+- In the latest period (February 2024), sales were **$2.53M** ($2,528,118), down **10.8%** from January 2024 ($2.83M).
+
+### 3. Low-Box Shipments (LBS)
+
+Shipments under 50 boxes are treated as samples or sub-optimal orders.
+
+| Metric | Value |
+|---|---|
+| LBS orders | **624** |
+| Total shipments | **6,113** |
+| LBS share | **10.2%** (target: 10.0%) |
+| Total boxes delivered | **2.08M** (2,077,844) |
+
+The LBS share is slightly **above** the 10% target. Since a lower share is better, this is an area to watch.
+
+### 4. Sales Team and Product Accountability
+
+- Each salesperson's margin is compared to the 60% target using Red-Amber-Green (RAG) icons.
+- **Husein Augar** ($1,473K sales, 62.9% margin) and **Dotty Strutley** ($1,424K sales, 62.7% margin) are above target.
+- Users can switch between the salesperson ranking and the product performance view without leaving the page.
 
 ---
 
-## 🛠️ Data Architecture & Star Schema Modeling
+## Data Model
 
-The semantic data model is designed using a classic Star Schema pattern to guarantee query performance, scalability, and clean relationship cardinalities:
+The model uses a **star schema** for fast queries and clean relationships.
 
-- **Fact Table**:
-  - `Shipments`: Contains granular transactional records including `Sales`, `Boxes`, `Date`, `Salesperson`, `Product`, and `Geography`.
-- **Dimension Tables**:
-  - `Salesperson`: Sales representative master data, regional alignments, and profile images.
-  - `Product`: Product hierarchy, categories (`Bars`, `Bites`, `Other`), and unit cost per box.
-  - `Geography`: Operational markets (`Australia`, `Canada`, `India`, `New Zealand`, `UK`, `USA`).
-  - `Calendar`: Dedicated date table marked as the official Date Table for DAX time intelligence functions.
+### Fact Table
+
+| Table | Description |
+|---|---|
+| `Shipments` | One row per shipment: `Date`, `Salesperson`, `Product`, `Geography`, `Boxes`, `Sales`, `Cost` |
+
+### Dimension Tables
+
+| Table | Description |
+|---|---|
+| `Salesperson` | Sales rep details, regional alignment and profile images |
+| `Product` | Product hierarchy, categories (`Bars`, `Bites`, `Other`) and unit cost per box |
+| `Geography` | Markets: Australia, Canada, India, New Zealand, UK, USA |
+| `Calendar` | Date table marked as the official Date Table for time-intelligence functions |
 
 ---
 
-## 📐 Core DAX Formulations
+## DAX Measures
 
-All key business metrics are centralized inside a dedicated `_measures` table for clean governance:
+All measures are stored in a dedicated `_measures` table.
 
-### 1. Revenue & Profitability
+### 1. Revenue and Profitability
+
 ```dax
-Total Sales = 
-SUM(Shipments[Sales])
+Total Sales = SUM(Shipments[Sales])
 
-Total Costs = 
-SUM(Shipments[Cost])
+Total Costs = SUM(Shipments[Cost])
 
-Total Profit = 
-[Total Sales] - [Total Costs]
+Total Profit = [Total Sales] - [Total Costs]
 
-Profit % = 
-DIVIDE([Total Profit], [Total Sales], 0)
+Profit % = DIVIDE([Total Profit], [Total Sales], 0)
 ```
-### 2. Low-Box Shipment (LBS) Metrics
+
+### 2. Low-Box Shipments
+
 ```dax
-LBS Count = 
+Total Shipments = COUNTROWS(Shipments)
+
+LBS Count =
 CALCULATE(
     COUNTROWS(Shipments),
     Shipments[Boxes] < 50
 )
 
-LBS % = 
-DIVIDE([LBS Count], [Total Shipments], 0)
+LBS % = DIVIDE([LBS Count], [Total Shipments], 0)
 ```
-### 3. Time Intelligence & Dynamic Month-on-Month
+
+### 3. Time Intelligence (Month-on-Month)
+
 ```dax
-Total Sales Previous Month = 
+Total Sales Previous Month =
 CALCULATE(
     [Total Sales],
     PREVIOUSMONTH('Calendar'[Date])
 )
 
-MoM Sales Change % = 
+MoM Sales Change % =
 VAR CurrentMonth = [Total Sales]
 VAR PriorMonth = [Total Sales Previous Month]
 RETURN
     DIVIDE(CurrentMonth - PriorMonth, PriorMonth, 0)
 ```
-### 4. Profit Target Benchmark & Status Indicator
+
+### 4. Profit Target and Status Indicator
+
 ```dax
 Profit Target = 0.60
 
-Profit Target Indicator = 
+Profit Target Indicator =
 IF(
-    [Profit %] >= [Profit Target],
-    2, -- Green / Target Met
-    IF([Profit %] >= 0.9 * [Profit Target], 1, 0) -- Amber / Below Target
+    [Profit %] >= [Profit Target], 2,                // Green: target met
+    IF([Profit %] >= 0.9 * [Profit Target], 1,       // Amber: within 10% of target
+    0)                                               // Red: below target
 )
 ```
+
+---
+
+## Dashboard Features
+
+| Feature | What it does |
+|---|---|
+| **Field parameters** | Button slicers switch the trend line between Sales, Boxes, Shipments, Costs and Profit, so no duplicate charts are needed. |
+| **Bookmarks and navigation** | Buttons switch between the Salesperson and Product matrices while keeping the active date and market filters. |
+| **Shipment histogram** | Box quantities are grouped into bins, with a zoom slider (0-1,000 range) and an LBS KPI gauge alongside. |
+| **Custom tooltips** | Hovering over the trend line shows each country's percentage contribution for that month. |
+| **Conditional formatting** | Color thresholds and traffic-light icons flag underperforming products and salespeople. |
+
+---
+
+## How to Open This Project
+
+1. Install **Power BI Desktop** on your computer.
+2. Clone or download this repository:
+
+   ```bash
+   git clone https://github.com/<your-username>/<your-repo-name>.git
+   ```
+
+3. Open `Awesome_Chocolates_Dashboard.pbix` (or your saved `.pbix` file name).
+
+All tables, models and visuals are bundled in the file, so you can use the slicers, switch bookmarks and inspect the DAX offline.
